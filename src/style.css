@@ -54,26 +54,11 @@ button, a { font: inherit; }
   letter-spacing: -0.8px;
 }
 
-.brand-mark {
+.brand-logo {
   width: 24px;
   height: 24px;
-  display: grid;
-  place-items: center;
-  border: 1.5px solid var(--green);
-  border-radius: 50%;
-  position: relative;
+  display: block;
 }
-
-.brand-mark::before, .brand-mark::after {
-  content: '';
-  position: absolute;
-  background: var(--green);
-  border-radius: 2px;
-}
-
-.brand-mark::before { width: 1.5px; height: 7px; top: 4px; }
-.brand-mark::after { width: 6px; height: 1.5px; top: 10px; left: 11px; transform: rotate(35deg); transform-origin: left; }
-.brand-mark span { width: 3px; height: 3px; border-radius: 50%; background: var(--green); z-index: 1; }
 
 .topbar-label, .status, .footer, .helper-text {
   font-family: 'DM Mono', monospace;
@@ -388,7 +373,9 @@ button, a { font: inherit; }
   .settings-button svg { width: 14px; height: 14px; }
   .stopwatch { padding: 60px 0 70px; }
   .status { margin-bottom: 26px; }
-  .clock { letter-spacing: -0.08em; }
+  .clock { max-width: 100%; letter-spacing: -0.08em; }
+  .clock-main { font-size: clamp(38px, 17vw, 64px); }
+  .clock-fraction { font-size: clamp(22px, 8.5vw, 34px); }
   .helper-text { font-size: 9px; margin: 18px 0 38px; }
   .controls { width: 100%; max-width: 340px; }
   .button { flex: 1; padding: 0 12px; }
@@ -415,4 +402,10 @@ button, a { font: inherit; }
   .repeat-count-label { justify-content: space-between; }
   .repeat-count-label input { width: 62px; }
   .floating-silence { right: 16px; bottom: 16px; min-height: 48px; padding: 0 14px; font-size: 12px; }
+}
+
+@media (max-width: 600px) and (max-height: 760px) {
+  .stopwatch { padding-top: 28px; padding-bottom: 34px; }
+  .status { margin-bottom: 20px; }
+  .helper-text { margin-top: 15px; margin-bottom: 30px; }
 }

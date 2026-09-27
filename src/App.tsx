@@ -316,9 +316,7 @@ function App() {
     <main className="page-shell">
       <header className="topbar">
         <a className="brand" href="/" aria-label="CronoTempo, inicio">
-          <span className="brand-mark" aria-hidden="true">
-            <span />
-          </span>
+          <img className="brand-logo" src="/icons/cronotempo.svg?v=10" alt="" aria-hidden="true" />
           <span>CronoTempo</span>
         </a>
         <div className="topbar-actions">

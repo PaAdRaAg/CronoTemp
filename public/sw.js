@@ -1,11 +1,13 @@
-const CACHE_NAME = 'cronotempo-shell-v1'
+const CACHE_NAME = 'cronotempo-shell-v11'
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/icons/apple-touch-icon.png',
+  '/icons/cronotempo.svg',
+  '/icons/cronotempo.svg?v=10',
+  '/icons/icon-192.png?v=10',
+  '/icons/icon-512.png?v=10',
+  '/icons/apple-touch-icon.png?v=10',
 ]
 
 self.addEventListener('install', (event) => {
