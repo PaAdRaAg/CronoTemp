@@ -397,6 +397,20 @@ function App() {
             </button>
           </div>
 
+          <div className={`repeat-controls ${repeatMode === 'count' ? 'has-count' : ''}`}>
+            <label htmlFor="repeat-mode">Repetir sonido</label>
+            <select id="repeat-mode" value={repeatMode} onChange={(event) => setRepeatMode(event.currentTarget.value as RepeatMode)}>
+              <option value="count">Un número de veces</option>
+              <option value="continuous">Hasta desactivar</option>
+            </select>
+            {repeatMode === 'count' && (
+              <label className="repeat-count-label">
+                <span>Cantidad</span>
+                <input type="number" min="1" step="1" value={repeatCount} onChange={(event) => setRepeatCount(removeLeadingZeros(event.currentTarget.value))} />
+              </label>
+            )}
+          </div>
+
           <div className="interval-fields" aria-label="Intervalo del aviso">
             <label>
               <span>Horas</span>
@@ -429,19 +443,6 @@ function App() {
             </button>
           </div>
 
-          <div className={`repeat-controls ${repeatMode === 'count' ? 'has-count' : ''}`}>
-            <label htmlFor="repeat-mode">Repetir sonido</label>
-            <select id="repeat-mode" value={repeatMode} onChange={(event) => setRepeatMode(event.currentTarget.value as RepeatMode)}>
-              <option value="count">Un número de veces</option>
-              <option value="continuous">Hasta desactivar</option>
-            </select>
-            {repeatMode === 'count' && (
-              <label className="repeat-count-label">
-                <span>Cantidad</span>
-                <input type="number" min="1" step="1" value={repeatCount} onChange={(event) => setRepeatCount(removeLeadingZeros(event.currentTarget.value))} />
-              </label>
-            )}
-          </div>
           <p className="repeat-help">
             {reminderInterval <= 0
               ? 'Configura un intervalo mayor que cero para activar el aviso.'
