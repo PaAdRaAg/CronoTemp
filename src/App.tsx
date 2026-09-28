@@ -7,7 +7,7 @@ type Lap = {
 }
 
 type SoundId = 'low-pulse' | 'low-bell' | 'medium-pulse' | 'medium-double' | 'medium-rising' | 'high-pulse' | 'high-double' | 'high-bell'
-type RepeatMode = 'once' | 'count' | 'continuous'
+type RepeatMode = 'count' | 'continuous'
 type ReminderPreferences = {
   intervalHours: string
   intervalMinutes: string
@@ -99,7 +99,7 @@ function startAlarm(sound: SoundId, mode: RepeatMode, count: number, onRepeating
   playSound(sound, true)
 
   const totalPlays = mode === 'count' ? Math.max(1, Math.floor(count)) : 1
-  if (mode === 'once' || (mode === 'count' && totalPlays === 1)) return
+  if (mode === 'count' && totalPlays === 1) return
 
   onRepeatingChange(true)
   let remaining = mode === 'count' ? totalPlays - 1 : Number.POSITIVE_INFINITY
@@ -145,8 +145,8 @@ function loadReminderPreferences(): ReminderPreferences {
     intervalMinutes: '0',
     intervalSeconds: '0',
     selectedSound: 'medium-pulse',
-    repeatMode: 'once',
-    repeatCount: '3',
+    repeatMode: 'count',
+    repeatCount: '1',
     reminderEnabled: false,
   }
 
@@ -156,17 +156,21 @@ function loadReminderPreferences(): ReminderPreferences {
     const saved = JSON.parse(raw) as Partial<ReminderPreferences>
     const validNumber = (value: unknown, fallback: string) =>
       typeof value === 'string' && /^\d*$/.test(value) ? removeLeadingZeros(value) : fallback
+    const savedHours = validNumber(saved.intervalHours, defaults.intervalHours)
+    const savedMinutes = validNumber(saved.intervalMinutes, defaults.intervalMinutes)
+    const savedSeconds = validNumber(saved.intervalSeconds, defaults.intervalSeconds)
+    const hasPreviousDefaultInterval = savedHours === '0' && savedMinutes === '1' && savedSeconds === '0'
 
     return {
-      intervalHours: validNumber(saved.intervalHours, defaults.intervalHours),
-      intervalMinutes: validNumber(saved.intervalMinutes, defaults.intervalMinutes),
-      intervalSeconds: validNumber(saved.intervalSeconds, defaults.intervalSeconds),
+      intervalHours: hasPreviousDefaultInterval ? defaults.intervalHours : savedHours,
+      intervalMinutes: hasPreviousDefaultInterval ? defaults.intervalMinutes : savedMinutes,
+      intervalSeconds: hasPreviousDefaultInterval ? defaults.intervalSeconds : savedSeconds,
       selectedSound: sounds.some((sound) => sound.id === saved.selectedSound) ? saved.selectedSound as SoundId : defaults.selectedSound,
-      repeatMode: saved.repeatMode === 'count' || saved.repeatMode === 'continuous' || saved.repeatMode === 'once'
-        ? saved.repeatMode
-        : defaults.repeatMode,
-      repeatCount: validNumber(saved.repeatCount, defaults.repeatCount),
-      reminderEnabled: typeof saved.reminderEnabled === 'boolean' ? saved.reminderEnabled : defaults.reminderEnabled,
+      repeatMode: saved.repeatMode === 'continuous' ? 'continuous' : 'count',
+      repeatCount: saved.repeatMode === 'count' ? validNumber(saved.repeatCount, defaults.repeatCount) : defaults.repeatCount,
+      reminderEnabled: hasPreviousDefaultInterval
+        ? defaults.reminderEnabled
+        : typeof saved.reminderEnabled === 'boolean' ? saved.reminderEnabled : defaults.reminderEnabled,
     }
   } catch {
     return defaults
@@ -428,9 +432,8 @@ function App() {
           <div className={`repeat-controls ${repeatMode === 'count' ? 'has-count' : ''}`}>
             <label htmlFor="repeat-mode">Repetir sonido</label>
             <select id="repeat-mode" value={repeatMode} onChange={(event) => setRepeatMode(event.currentTarget.value as RepeatMode)}>
-              <option value="once">Una vez</option>
               <option value="count">Un número de veces</option>
-              <option value="continuous">Indefinidamente</option>
+              <option value="continuous">Hasta desactivar</option>
             </select>
             {repeatMode === 'count' && (
               <label className="repeat-count-label">
@@ -440,11 +443,11 @@ function App() {
             )}
           </div>
           <p className="repeat-help">
-            {repeatMode === 'continuous'
-              ? 'Se repetirá hasta que silencies el sonido.'
-              : repeatMode === 'count'
-                ? 'La cantidad incluye el primer sonido.'
-                : 'El aviso sonará una sola vez.'}
+            {reminderInterval <= 0
+              ? 'Configura un intervalo mayor que cero para activar el aviso.'
+              : repeatMode === 'continuous'
+                ? 'Se repetirá hasta que silencies el sonido.'
+                : `Sonará ${repeatCount || '1'} ${Number(repeatCount) === 1 ? 'vez' : 'veces'} en cada intervalo.`}
           </p>
 
           {alarmRepeating && (
